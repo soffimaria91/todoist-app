@@ -1,0 +1,45 @@
+<template>
+    <lightning-card title="Todoist Connection Settings" icon-name="custom:custom18">
+        <div class="slds-p-around_medium">
+            <template if:true={isLoading}>
+                <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+            </template>
+            
+            <template if:true={error}>
+                <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+                    <span class="slds-assistive-text">error</span>
+                    <h2>{error}</h2>
+                </div>
+            </template>
+            
+            <div class="slds-m-bottom_medium">
+                <template if:true={isConnected}>
+                    <div class="slds-text-color_success slds-text-heading_small">
+                        <lightning-icon icon-name="utility:success" size="small" variant="success" class="slds-m-right_x-small"></lightning-icon>
+                        Connected to Todoist
+                    </div>
+                    <p class="slds-m-top_small">Your Salesforce account is connected to Todoist.</p>
+                    <lightning-button 
+                        label="Disconnect" 
+                        variant="destructive" 
+                        onclick={handleDisconnect}
+                        class="slds-m-top_medium">
+                    </lightning-button>
+                </template>
+                <template if:false={isConnected}>
+                    <div class="slds-text-color_error slds-text-heading_small">
+                        <lightning-icon icon-name="utility:warning" size="small" variant="error" class="slds-m-right_x-small"></lightning-icon>
+                        Not Connected
+                    </div>
+                    <p class="slds-m-top_small">Connect your Salesforce account to Todoist to get started.</p>
+                    <lightning-button 
+                        label="Connect to Todoist" 
+                        variant="brand" 
+                        onclick={handleConnect}
+                        class="slds-m-top_medium">
+                    </lightning-button>
+                </template>
+            </div>
+        </div>
+    </lightning-card>
+</template> 

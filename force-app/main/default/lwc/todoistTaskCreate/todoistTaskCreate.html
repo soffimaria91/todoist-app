@@ -1,0 +1,57 @@
+<template>
+    <lightning-card title="Create Todoist Task" icon-name="custom:custom18">
+        <div class="slds-p-around_medium">
+            <template if:true={isLoading}>
+                <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+            </template>
+            
+            <template if:true={error}>
+                <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+                    <span class="slds-assistive-text">error</span>
+                    <h2>{error}</h2>
+                </div>
+            </template>
+            
+            <div class="slds-form">
+                <lightning-input 
+                    label="Task Title" 
+                    value={taskContent}
+                    onchange={handleContentChange}
+                    required>
+                </lightning-input>
+                
+                <lightning-textarea 
+                    label="Description" 
+                    value={taskDescription}
+                    onchange={handleDescriptionChange}
+                    class="slds-m-top_small">
+                </lightning-textarea>
+                
+                <lightning-input 
+                    type="date" 
+                    label="Due Date" 
+                    value={taskDueDate}
+                    onchange={handleDueDateChange}
+                    class="slds-m-top_small">
+                </lightning-input>
+                
+                <lightning-combobox
+                    label="Priority"
+                    value={taskPriority}
+                    options={priorityOptions}
+                    onchange={handlePriorityChange}
+                    class="slds-m-top_small">
+                </lightning-combobox>
+                
+                <div class="slds-m-top_medium">
+                    <lightning-button 
+                        label="Create Task" 
+                        variant="brand" 
+                        onclick={handleCreateTask}
+                        disabled={isLoading}>
+                    </lightning-button>
+                </div>
+            </div>
+        </div>
+    </lightning-card>
+</template> 

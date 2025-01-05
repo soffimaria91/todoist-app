@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <applicationVisibilities>
+        <application>Todoist_Integration</application>
+        <visible>true</visible>
+    </applicationVisibilities>
+    <description>Permissions for users who need to access the Todoist Integration</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Todoist Integration User</label>
+    <tabSettings>
+        <tab>Todoist_Settings</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
+    <tabSettings>
+        <tab>Todoist_Tasks</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>true</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>Todoist_Settings__c</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+</PermissionSet> 
