@@ -4,17 +4,50 @@
         <application>Todoist_Integration</application>
         <visible>true</visible>
     </applicationVisibilities>
+    <classAccesses>
+        <apexClass>TodoistAuthService</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>TodoistAuthController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>TodoistAPIService</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>TodoistTaskController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
     <description>Permissions for users who need to access the Todoist Integration</description>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Todoist_Settings__c.Access_Token__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Todoist_Settings__c.Connected__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Todoist_Settings__c.Refresh_Token__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Todoist_Settings__c.Token_Expiry__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Todoist_Settings__c.User__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
     <hasActivationRequired>false</hasActivationRequired>
     <label>Todoist Integration User</label>
-    <tabSettings>
-        <tab>Todoist_Settings</tab>
-        <visibility>Visible</visibility>
-    </tabSettings>
-    <tabSettings>
-        <tab>Todoist_Tasks</tab>
-        <visibility>Visible</visibility>
-    </tabSettings>
     <objectPermissions>
         <allowCreate>true</allowCreate>
         <allowDelete>true</allowDelete>
@@ -24,4 +57,12 @@
         <object>Todoist_Settings__c</object>
         <viewAllRecords>false</viewAllRecords>
     </objectPermissions>
+    <tabSettings>
+        <tab>Todoist_Settings</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
+    <tabSettings>
+        <tab>Todoist_Tasks</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
 </PermissionSet> 

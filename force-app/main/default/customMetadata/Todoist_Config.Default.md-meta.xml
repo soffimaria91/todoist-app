@@ -7,10 +7,6 @@
         <value xsi:type="xsd:string">https://todoist.com/oauth/authorize</value>
     </values>
     <values>
-        <field>Token_Endpoint__c</field>
-        <value xsi:type="xsd:string">https://todoist.com/oauth/access_token</value>
-    </values>
-    <values>
         <field>Client_Id__c</field>
         <value xsi:type="xsd:string">e5abe760526e4f6eb73521871cabff69</value>
     </values>
@@ -20,6 +16,10 @@
     </values>
     <values>
         <field>Redirect_URI__c</field>
-        <value xsi:type="xsd:string">https://gmailcomdev266-dev-ed.develop.lightning.force.com</value>
+        <value xsi:type="xsd:string">https://gmailcomdev266-dev-ed.develop.lightning.force.com/apex/TodoistOAuthCallback</value>
+    </values>
+    <values>
+        <field>Token_Endpoint__c</field>
+        <value xsi:type="xsd:string">https://todoist.com/oauth/access_token</value>
     </values>
 </CustomMetadata> 

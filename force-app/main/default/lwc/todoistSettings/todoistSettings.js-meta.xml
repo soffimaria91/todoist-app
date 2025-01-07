@@ -3,11 +3,11 @@
     <apiVersion>57.0</apiVersion>
     <isExposed>true</isExposed>
     <masterLabel>Todoist Settings</masterLabel>
-    <description>Component for managing Todoist integration settings and authentication</description>
+    <description>Configure Todoist integration settings</description>
     <targets>
         <target>lightning__AppPage</target>
         <target>lightning__RecordPage</target>
         <target>lightning__HomePage</target>
         <target>lightning__Tab</target>
     </targets>
-</LightningComponentBundle> 
+</LightningComponentBundle>

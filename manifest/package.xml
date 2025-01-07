@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
     <types>
+        <members>TodoistAuthService</members>
+        <members>TodoistAuthController</members>
+        <members>TodoistAPIService</members>
+        <members>TodoistTaskController</members>
+        <members>TodoistOAuthCallbackController</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>todoistSettings</members>
+        <name>LightningComponentBundle</name>
+    </types>
+    <types>
         <members>Todoist_Settings__c</members>
         <members>Todoist_Config__mdt</members>
         <name>CustomObject</name>
@@ -19,19 +31,6 @@
         <name>CustomField</name>
     </types>
     <types>
-        <members>TodoistAuthService</members>
-        <members>TodoistAuthController</members>
-        <name>ApexClass</name>
-    </types>
-    <types>
-        <members>todoistSettings</members>
-        <name>LightningComponentBundle</name>
-    </types>
-    <types>
-        <members>Todoist_Settings</members>
-        <name>CustomTab</name>
-    </types>
-    <types>
         <members>Todoist_Config.Default</members>
         <name>CustomMetadata</name>
     </types>
@@ -45,12 +44,13 @@
         <name>PermissionSet</name>
     </types>
     <types>
-        <members>Todoist_Integration</members>
-        <name>CustomApplication</name>
+        <members>Todoist_Settings</members>
+        <members>Todoist_Tasks</members>
+        <name>CustomTab</name>
     </types>
     <types>
-        <members>Todoist_Integration_UtilityBar</members>
-        <name>FlexiPage</name>
+        <members>TodoistOAuthCallback</members>
+        <name>ApexPage</name>
     </types>
     <version>57.0</version>
 </Package>

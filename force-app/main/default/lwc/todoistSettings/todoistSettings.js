@@ -1,104 +1,132 @@
 import { LightningElement, track } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import initiateAuth from '@salesforce/apex/TodoistAuthController.initiateAuth';
+import handleOAuthCallback from '@salesforce/apex/TodoistAuthController.handleOAuthCallback';
 import isConnected from '@salesforce/apex/TodoistAuthController.isConnected';
 import disconnect from '@salesforce/apex/TodoistAuthController.disconnect';
-import handleOAuthCallback from '@salesforce/apex/TodoistAuthController.handleOAuthCallback';
 
 export default class TodoistSettings extends LightningElement {
-    @track isConnected = false;
-    @track isLoading = true;
-    @track error;
-    
+    @track connected = false;
+    @track loading = true;
+    @track error = null;
+
     connectedCallback() {
         this.checkConnectionStatus();
+        // Check if we're returning from OAuth
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const state = urlParams.get('state');
+        
+        console.log('URL Parameters:', { code: code ? 'present' : 'missing', state: state ? 'present' : 'missing' });
+        
+        if (code && state) {
+            console.log('Handling OAuth callback');
+            this.handleOAuthCallback(code, state);
+        }
     }
-    
+
     async checkConnectionStatus() {
         try {
-            this.isLoading = true;
-            this.isConnected = await isConnected();
-            this.error = undefined;
+            this.loading = true;
+            this.error = null;
+            this.connected = await isConnected();
+            console.log('Connection status:', this.connected);
         } catch (error) {
-            this.error = error.body?.message || 'An error occurred while checking connection status';
+            console.error('Error checking connection:', error);
+            this.error = this.getErrorMessage(error);
+            this.showError('Error checking connection status', this.error);
         } finally {
-            this.isLoading = false;
+            this.loading = false;
         }
     }
-    
+
     async handleConnect() {
         try {
-            this.isLoading = true;
+            this.loading = true;
+            this.error = null;
+            console.log('Initiating auth...');
             const authUrl = await initiateAuth();
+            console.log('Auth URL:', authUrl);
             
-            // Open the OAuth window
-            const width = 600;
-            const height = 700;
-            const left = (screen.width/2)-(width/2);
-            const top = (screen.height/2)-(height/2);
-            
-            window.open(
-                authUrl,
-                'Todoist Authorization',
-                'width=' + width + ',height=' + height + ',left=' + left + ',top=' + top
-            );
-            
-            // Listen for the OAuth callback message
-            window.addEventListener('message', this.handleOAuthMessage.bind(this), false);
-            
-        } catch (error) {
-            this.error = error.body?.message || 'An error occurred while initiating authentication';
-            this.dispatchToast('Error', this.error, 'error');
-        } finally {
-            this.isLoading = false;
-        }
-    }
-    
-    async handleOAuthMessage(event) {
-        // Verify the message origin for security
-        // Replace with your actual Salesforce domain
-        if (!event.origin.endsWith('.salesforce.com')) {
-            return;
-        }
-        
-        const { code, state } = event.data;
-        if (code && state) {
-            try {
-                this.isLoading = true;
-                await handleOAuthCallback({ code, state });
-                await this.checkConnectionStatus();
-                this.dispatchToast('Success', 'Successfully connected to Todoist', 'success');
-            } catch (error) {
-                this.error = error.body?.message || 'An error occurred during OAuth callback';
-                this.dispatchToast('Error', this.error, 'error');
-            } finally {
-                this.isLoading = false;
+            if (!authUrl) {
+                throw new Error('No auth URL returned');
             }
+
+            // Redirect to Todoist auth page
+            console.log('Redirecting to:', authUrl);
+            window.location.assign(authUrl);
+        } catch (error) {
+            console.error('Error in handleConnect:', error);
+            this.error = this.getErrorMessage(error);
+            this.showError('Error initiating authentication', this.error);
+        } finally {
+            this.loading = false;
         }
     }
-    
+
+    async handleOAuthCallback(code, state) {
+        try {
+            this.loading = true;
+            this.error = null;
+            console.log('Processing OAuth callback');
+            await handleOAuthCallback(code, state);
+            await this.checkConnectionStatus();
+            this.showSuccess('Successfully connected to Todoist');
+            // Clear the URL parameters
+            window.history.replaceState({}, document.title, window.location.pathname);
+        } catch (error) {
+            console.error('Error in handleOAuthCallback:', error);
+            this.error = this.getErrorMessage(error);
+            this.showError('Error completing authentication', this.error);
+        } finally {
+            this.loading = false;
+        }
+    }
+
     async handleDisconnect() {
         try {
-            this.isLoading = true;
+            this.loading = true;
+            this.error = null;
             await disconnect();
-            this.isConnected = false;
-            this.error = undefined;
-            this.dispatchToast('Success', 'Successfully disconnected from Todoist', 'success');
+            this.connected = false;
+            this.showSuccess('Successfully disconnected from Todoist');
         } catch (error) {
-            this.error = error.body?.message || 'An error occurred while disconnecting';
-            this.dispatchToast('Error', this.error, 'error');
+            console.error('Error disconnecting:', error);
+            this.error = this.getErrorMessage(error);
+            this.showError('Error disconnecting', this.error);
         } finally {
-            this.isLoading = false;
+            this.loading = false;
         }
     }
-    
-    dispatchToast(title, message, variant) {
-        this.dispatchEvent(
-            new ShowToastEvent({
-                title,
-                message,
-                variant
-            })
-        );
+
+    getErrorMessage(error) {
+        console.error('Raw error:', error);
+        if (error.body && error.body.message) {
+            return error.body.message;
+        }
+        if (error.message) {
+            return error.message;
+        }
+        if (typeof error === 'string') {
+            return error;
+        }
+        return 'An unknown error occurred';
     }
-} 
+
+    showSuccess(title, message = '') {
+        this.dispatchEvent(new ShowToastEvent({
+            title,
+            message,
+            variant: 'success'
+        }));
+    }
+
+    showError(title, message) {
+        this.dispatchEvent(new ShowToastEvent({
+            title,
+            message,
+            variant: 'error',
+            mode: 'sticky'
+        }));
+    }
+}

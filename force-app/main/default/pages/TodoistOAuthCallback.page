@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<apex:page controller="TodoistOAuthCallbackController" showHeader="false" standardStylesheets="false" applyHtmlTag="true" applyBodyTag="false" docType="html-5.0">
+    <html>
+        <head>
+            <apex:slds />
+            <script>
+                function redirectToComponent() {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const code = urlParams.get('code');
+                    const state = urlParams.get('state');
+                    const error = urlParams.get('error');
+                    
+                    // Get the base URL for the Lightning component
+                    let baseUrl = window.location.origin + '/lightning/n/Todoist_Settings';
+                    
+                    if (error) {
+                        baseUrl += '?error=' + encodeURIComponent(error);
+                        if (urlParams.get('error_description')) {
+                            baseUrl += '&error_description=' + encodeURIComponent(urlParams.get('error_description'));
+                        }
+                    } else if (code && state) {
+                        baseUrl += '?code=' + encodeURIComponent(code) + '&state=' + encodeURIComponent(state);
+                    }
+                    
+                    window.location.href = baseUrl;
+                }
+                
+                window.onload = redirectToComponent;
+            </script>
+        </head>
+        <body>
+            <div class="slds-scope">
+                <div class="slds-p-around_medium">
+                    <div class="slds-is-relative slds-align_absolute-center">
+                        <div class="slds-spinner_container">
+                            <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                                <span class="slds-assistive-text">Redirecting...</span>
+                                <div class="slds-spinner__dot-a"></div>
+                                <div class="slds-spinner__dot-b"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </body>
+    </html>
+</apex:page> 
