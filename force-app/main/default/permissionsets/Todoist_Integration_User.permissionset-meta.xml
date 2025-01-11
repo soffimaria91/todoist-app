@@ -20,6 +20,10 @@
         <apexClass>TodoistTaskController</apexClass>
         <enabled>true</enabled>
     </classAccesses>
+    <classAccesses>
+        <apexClass>TodoistOAuthCallbackController</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
     <description>Permissions for users who need to access the Todoist Integration</description>
     <fieldPermissions>
         <editable>true</editable>
@@ -46,6 +50,31 @@
         <field>Todoist_Settings__c.User__c</field>
         <readable>true</readable>
     </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Todoist_Config__mdt.Auth_Endpoint__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Todoist_Config__mdt.Client_Id__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Todoist_Config__mdt.Client_Secret__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Todoist_Config__mdt.Redirect_URI__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Todoist_Config__mdt.Token_Endpoint__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
     <hasActivationRequired>false</hasActivationRequired>
     <label>Todoist Integration User</label>
     <objectPermissions>
@@ -57,6 +86,10 @@
         <object>Todoist_Settings__c</object>
         <viewAllRecords>false</viewAllRecords>
     </objectPermissions>
+    <pageAccesses>
+        <apexPage>TodoistOAuthCallback</apexPage>
+        <enabled>true</enabled>
+    </pageAccesses>
     <tabSettings>
         <tab>Todoist_Settings</tab>
         <visibility>Visible</visibility>

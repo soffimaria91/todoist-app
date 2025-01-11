@@ -1,57 +1,45 @@
 <template>
-    <lightning-card title="Create Todoist Task" icon-name="custom:custom18">
-        <div class="slds-p-around_medium">
-            <template if:true={isLoading}>
-                <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
-            </template>
+    <lightning-quick-action-panel header="New Todoist Task">
+        <div class="slds-form">
+            <lightning-input
+                label="Subject"
+                required
+                value={subject}
+                onchange={handleSubjectChange}>
+            </lightning-input>
             
-            <template if:true={error}>
-                <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
-                    <span class="slds-assistive-text">error</span>
-                    <h2>{error}</h2>
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col">
+                    <lightning-input
+                        type="date"
+                        label="Due Date"
+                        value={dueDate}
+                        onchange={handleDueDateChange}>
+                    </lightning-input>
                 </div>
-            </template>
-            
-            <div class="slds-form">
-                <lightning-input 
-                    label="Task Title" 
-                    value={taskContent}
-                    onchange={handleContentChange}
-                    required>
-                </lightning-input>
-                
-                <lightning-textarea 
-                    label="Description" 
-                    value={taskDescription}
-                    onchange={handleDescriptionChange}
-                    class="slds-m-top_small">
-                </lightning-textarea>
-                
-                <lightning-input 
-                    type="date" 
-                    label="Due Date" 
-                    value={taskDueDate}
-                    onchange={handleDueDateChange}
-                    class="slds-m-top_small">
-                </lightning-input>
-                
-                <lightning-combobox
-                    label="Priority"
-                    value={taskPriority}
-                    options={priorityOptions}
-                    onchange={handlePriorityChange}
-                    class="slds-m-top_small">
-                </lightning-combobox>
-                
-                <div class="slds-m-top_medium">
-                    <lightning-button 
-                        label="Create Task" 
-                        variant="brand" 
-                        onclick={handleCreateTask}
-                        disabled={isLoading}>
-                    </lightning-button>
+                <div class="slds-col">
+                    <lightning-combobox
+                        label="Priority"
+                        value={priority}
+                        options={priorityOptions}
+                        onchange={handlePriorityChange}>
+                    </lightning-combobox>
                 </div>
             </div>
         </div>
-    </lightning-card>
+        
+        <div slot="footer">
+            <lightning-button
+                variant="neutral"
+                label="Cancel"
+                onclick={handleCancel}
+                class="slds-m-right_x-small">
+            </lightning-button>
+            <lightning-button
+                variant="brand"
+                label="Save"
+                onclick={handleSave}>
+            </lightning-button>
+        </div>
+    </lightning-quick-action-panel>
 </template> 

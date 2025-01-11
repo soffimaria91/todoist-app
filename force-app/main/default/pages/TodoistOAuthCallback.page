@@ -1,45 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<apex:page controller="TodoistOAuthCallbackController" showHeader="false" standardStylesheets="false" applyHtmlTag="true" applyBodyTag="false" docType="html-5.0">
+<apex:page controller="TodoistOAuthCallbackController" action="{!handleCallback}" showHeader="false" standardStylesheets="false" applyHtmlTag="true" applyBodyTag="false" docType="html-5.0" lightningStylesheets="true">
     <html>
         <head>
             <apex:slds />
-            <script>
-                function redirectToComponent() {
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const code = urlParams.get('code');
-                    const state = urlParams.get('state');
-                    const error = urlParams.get('error');
-                    
-                    // Get the base URL for the Lightning component
-                    let baseUrl = window.location.origin + '/lightning/n/Todoist_Settings';
-                    
-                    if (error) {
-                        baseUrl += '?error=' + encodeURIComponent(error);
-                        if (urlParams.get('error_description')) {
-                            baseUrl += '&error_description=' + encodeURIComponent(urlParams.get('error_description'));
-                        }
-                    } else if (code && state) {
-                        baseUrl += '?code=' + encodeURIComponent(code) + '&state=' + encodeURIComponent(state);
-                    }
-                    
-                    window.location.href = baseUrl;
-                }
-                
-                window.onload = redirectToComponent;
-            </script>
+            <meta http-equiv="Content-Security-Policy" 
+                  content="default-src 'self' https://todoist.com https://*.force.com https://*.salesforce.com https://*.develop.lightning.force.com;
+                          script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.force.com https://*.salesforce.com https://*.develop.lightning.force.com;
+                          img-src 'self' data: https://*.force.com https://*.salesforce.com https://*.develop.lightning.force.com;
+                          style-src 'self' 'unsafe-inline' https://*.force.com https://*.salesforce.com https://*.develop.lightning.force.com;
+                          frame-src 'self' https://*.force.com https://*.salesforce.com https://*.develop.lightning.force.com https://todoist.com;
+                          connect-src 'self' https://*.force.com https://*.salesforce.com https://*.develop.lightning.force.com https://todoist.com;" />
         </head>
         <body>
             <div class="slds-scope">
                 <div class="slds-p-around_medium">
-                    <div class="slds-is-relative slds-align_absolute-center">
+                    <!-- Loading State -->
+                    <div id="loadingContainer" class="slds-is-relative slds-align_absolute-center">
                         <div class="slds-spinner_container">
                             <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
-                                <span class="slds-assistive-text">Redirecting...</span>
+                                <span class="slds-assistive-text">Loading</span>
                                 <div class="slds-spinner__dot-a"></div>
                                 <div class="slds-spinner__dot-b"></div>
                             </div>
                         </div>
+                        <div class="slds-m-top_large slds-text-heading_small">
+                            Processing authentication...
+                        </div>
                     </div>
+                    
+                    <!-- Error State -->
+                    <apex:outputPanel id="errorPanel" rendered="{!hasError}">
+                        <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+                            <span class="slds-assistive-text">error</span>
+                            <h2 class="slds-text-heading_small">
+                                Error: {!errorMessage}
+                            </h2>
+                        </div>
+                    </apex:outputPanel>
                 </div>
             </div>
         </body>

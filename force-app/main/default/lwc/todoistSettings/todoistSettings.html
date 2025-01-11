@@ -14,20 +14,45 @@
 
             <div class="slds-m-bottom_medium">
                 <template if:false={connected}>
-                    <div class="slds-media">
-                        <div class="slds-media__figure">
-                            <lightning-icon icon-name="utility:close" size="small" variant="error"></lightning-icon>
-                        </div>
-                        <div class="slds-media__body">
-                            <p>Not connected to Todoist</p>
+                    <div class="slds-text-align_center slds-m-bottom_medium">
+                        <lightning-button 
+                            label="Connect with Todoist" 
+                            onclick={handleConnect} 
+                            variant="brand"
+                            class="slds-m-bottom_medium"
+                            disabled={loading}>
+                        </lightning-button>
+                        <p class="slds-text-body_small slds-text-color_weak">- or -</p>
+                    </div>
+                    
+                    <div class="slds-grid slds-gutters">
+                        <div class="slds-col slds-size_3-of-4">
+                            <lightning-input 
+                                type="text" 
+                                label="Todoist API Token" 
+                                value={apiToken}
+                                onchange={handleTokenChange}
+                                placeholder="Enter your Todoist API token"
+                                required>
+                            </lightning-input>
+                            <div class="slds-text-color_weak slds-text-body_small slds-m-top_xx-small">
+                                You can find your API token in Todoist Settings > Integrations > Developer
+                            </div>
                         </div>
                     </div>
                     <div class="slds-m-top_small">
                         <lightning-button 
-                            label="Connect to Todoist" 
-                            onclick={handleConnect} 
-                            variant="brand"
+                            label="Connect with Token" 
+                            onclick={handleTokenConnect} 
+                            variant="neutral"
+                            class="slds-m-right_x-small"
                             disabled={loading}>
+                        </lightning-button>
+                        <lightning-button 
+                            label="Test Connection" 
+                            onclick={handleTestConnection} 
+                            variant="neutral"
+                            disabled={isTestDisabled}>
                         </lightning-button>
                     </div>
                 </template>

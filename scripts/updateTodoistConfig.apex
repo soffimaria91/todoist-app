@@ -20,7 +20,7 @@ clientSecret.value = 'b5f09cb1fc0540afbea2b0f9c1dae80a';
 
 Metadata.CustomMetadataValue redirectUri = new Metadata.CustomMetadataValue();
 redirectUri.field = 'Redirect_URI__c';
-redirectUri.value = 'https://gmailcomdev266-dev-ed.develop.lightning.force.com';
+redirectUri.value = 'https://gmailcomdev266-dev-ed.develop.lightning.force.com/apex/TodoistOAuthCallback';
 
 customMetadata.values = new List<Metadata.CustomMetadataValue>{
     authEndpoint, tokenEndpoint, clientId, clientSecret, redirectUri

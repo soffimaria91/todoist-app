@@ -16,7 +16,7 @@
     </values>
     <values>
         <field>Redirect_URI__c</field>
-        <value xsi:type="xsd:string">https://gmailcomdev266-dev-ed.develop.lightning.force.com/apex/TodoistOAuthCallback</value>
+        <value xsi:type="xsd:string">https://gmailcomdev266-dev-ed.develop.lightning.force.com</value>
     </values>
     <values>
         <field>Token_Endpoint__c</field>

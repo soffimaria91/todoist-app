@@ -1,80 +1,66 @@
-import { LightningElement, track } from 'lwc';
+import { LightningElement, api } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { CloseActionScreenEvent } from 'lightning/actions';
 import createTask from '@salesforce/apex/TodoistTaskController.createTask';
 
 export default class TodoistTaskCreate extends LightningElement {
-    @track taskContent = '';
-    @track taskDescription = '';
-    @track taskDueDate = '';
-    @track taskPriority = '4';
-    @track isLoading = false;
-    @track error;
+    @api recordId;
+    subject = '';
+    dueDate = null;
+    priority = '1'; // Default to Priority 4 (Low) which maps to p1 in Todoist
 
     get priorityOptions() {
         return [
-            { label: 'Priority 1 (Highest)', value: '1' },
-            { label: 'Priority 2', value: '2' },
-            { label: 'Priority 3', value: '3' },
-            { label: 'Priority 4 (Normal)', value: '4' }
+            { label: 'Priority 1 (Urgent)', value: '4' },
+            { label: 'Priority 2 (High)', value: '3' },
+            { label: 'Priority 3 (Medium)', value: '2' },
+            { label: 'Priority 4 (Low)', value: '1' }
         ];
     }
 
-    handleContentChange(event) {
-        this.taskContent = event.target.value;
-    }
-
-    handleDescriptionChange(event) {
-        this.taskDescription = event.target.value;
+    handleSubjectChange(event) {
+        this.subject = event.target.value;
     }
 
     handleDueDateChange(event) {
-        this.taskDueDate = event.target.value;
+        this.dueDate = event.target.value;
     }
 
     handlePriorityChange(event) {
-        this.taskPriority = event.target.value;
+        this.priority = event.target.value;
     }
 
-    async handleCreateTask() {
-        if (!this.taskContent) {
-            this.dispatchToast('Error', 'Task title is required', 'error');
+    handleCancel() {
+        this.dispatchEvent(new CloseActionScreenEvent());
+    }
+
+    handleSave() {
+        if (!this.subject) {
+            this.showToast('Error', 'Subject is required', 'error');
             return;
         }
 
-        try {
-            this.isLoading = true;
-            this.error = undefined;
-
-            await createTask({
-                content: this.taskContent,
-                description: this.taskDescription,
-                dueDate: this.taskDueDate,
-                priority: this.taskPriority
+        createTask({ 
+            subject: this.subject, 
+            dueDate: this.dueDate,
+            priority: this.priority,
+            relatedToId: this.recordId 
+        })
+            .then(() => {
+                this.showToast('Success', 'Task created in Todoist', 'success');
+                this.dispatchEvent(new CloseActionScreenEvent());
+            })
+            .catch(error => {
+                this.showToast('Error', error.body.message, 'error');
             });
-
-            this.dispatchToast('Success', 'Task created in Todoist', 'success');
-            this.resetForm();
-        } catch (error) {
-            this.error = error.body?.message || 'An error occurred while creating the task';
-            this.dispatchToast('Error', this.error, 'error');
-        } finally {
-            this.isLoading = false;
-        }
     }
 
-    resetForm() {
-        this.taskContent = '';
-        this.taskDescription = '';
-        this.taskDueDate = '';
-        this.taskPriority = '4';
-    }
-
-    dispatchToast(title, message, variant) {
+    showToast(title, message, variant) {
         this.dispatchEvent(
             new ShowToastEvent({
-                title,
-                message,
-                variant
+                title: title,
+                message: message,
+                variant: variant
             })
         );
     }
