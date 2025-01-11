@@ -1,7 +1,8 @@
 import { LightningElement, track } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import initiateAuth from '@salesforce/apex/TodoistAuthController.initiateAuth';
-import handleOAuthCallback from '@salesforce/apex/TodoistAuthController.handleOAuthCallback';
+import connectWithToken from '@salesforce/apex/TodoistAuthController.connectWithToken';
+import testConnection from '@salesforce/apex/TodoistAuthController.testConnection';
 import isConnected from '@salesforce/apex/TodoistAuthController.isConnected';
 import disconnect from '@salesforce/apex/TodoistAuthController.disconnect';
 
@@ -9,19 +10,59 @@ export default class TodoistSettings extends LightningElement {
     @track connected = false;
     @track loading = true;
     @track error = null;
+    @track apiToken = '';
+
+    get isTestDisabled() {
+        return !this.apiToken || this.loading;
+    }
 
     connectedCallback() {
-        this.checkConnectionStatus();
+        console.log('[TodoistSettings] Component initialized');
+        
         // Check if we're returning from OAuth
         const urlParams = new URLSearchParams(window.location.search);
-        const code = urlParams.get('code');
-        const state = urlParams.get('state');
+        const success = urlParams.get('success');
         
-        console.log('URL Parameters:', { code: code ? 'present' : 'missing', state: state ? 'present' : 'missing' });
+        if (success === 'true') {
+            console.log('[TodoistSettings] Detected successful OAuth callback');
+            // Clear the success parameter from the URL without refreshing
+            const newUrl = window.location.pathname;
+            window.history.replaceState({}, '', newUrl);
+            
+            // Show success message
+            this.showSuccess('Successfully connected to Todoist');
+        }
         
-        if (code && state) {
-            console.log('Handling OAuth callback');
-            this.handleOAuthCallback(code, state);
+        this.checkConnectionStatus();
+    }
+
+    async handleConnect() {
+        try {
+            this.loading = true;
+            this.error = null;
+            console.log('[TodoistSettings] Initiating OAuth flow...');
+            const authUrl = await initiateAuth();
+            console.log('[TodoistSettings] Generated auth URL:', authUrl);
+            console.log('[TodoistSettings] Current location:', window.location.href);
+            console.log('[TodoistSettings] Attempting redirect...');
+            
+            // Force the redirect using window.open
+            const redirectWindow = window.open(authUrl, '_self');
+            if (!redirectWindow) {
+                throw new Error('Failed to open redirect window. Please check your popup blocker settings.');
+            }
+            
+            console.log('[TodoistSettings] Redirect initiated');
+        } catch (error) {
+            console.error('[TodoistSettings] Error initiating OAuth:', error);
+            console.error('[TodoistSettings] Error details:', {
+                message: error.message,
+                body: error.body,
+                stack: error.stack
+            });
+            this.error = this.getErrorMessage(error);
+            this.showError('Error initiating authentication', this.error);
+            this.loading = false;
         }
     }
 
@@ -29,10 +70,16 @@ export default class TodoistSettings extends LightningElement {
         try {
             this.loading = true;
             this.error = null;
+            console.log('[TodoistSettings] Checking connection status...');
             this.connected = await isConnected();
-            console.log('Connection status:', this.connected);
+            console.log('[TodoistSettings] Connection status:', this.connected);
         } catch (error) {
-            console.error('Error checking connection:', error);
+            console.error('[TodoistSettings] Error checking connection:', error);
+            console.error('[TodoistSettings] Error details:', {
+                message: error.message,
+                body: error.body,
+                stack: error.stack
+            });
             this.error = this.getErrorMessage(error);
             this.showError('Error checking connection status', this.error);
         } finally {
@@ -40,44 +87,51 @@ export default class TodoistSettings extends LightningElement {
         }
     }
 
-    async handleConnect() {
+    handleTokenChange(event) {
+        this.apiToken = event.target.value;
+    }
+
+    async handleTokenConnect() {
+        if (!this.apiToken) {
+            this.showError('Error', 'Please enter a valid API token');
+            return;
+        }
+
         try {
             this.loading = true;
             this.error = null;
-            console.log('Initiating auth...');
-            const authUrl = await initiateAuth();
-            console.log('Auth URL:', authUrl);
-            
-            if (!authUrl) {
-                throw new Error('No auth URL returned');
-            }
-
-            // Redirect to Todoist auth page
-            console.log('Redirecting to:', authUrl);
-            window.location.assign(authUrl);
+            console.log('[TodoistSettings] Connecting with token...');
+            await connectWithToken({ token: this.apiToken });
+            console.log('[TodoistSettings] Successfully connected with token');
+            this.connected = true;
+            this.showSuccess('Successfully connected to Todoist');
+            await this.checkConnectionStatus();
         } catch (error) {
-            console.error('Error in handleConnect:', error);
+            console.error('[TodoistSettings] Error connecting with token:', error);
             this.error = this.getErrorMessage(error);
-            this.showError('Error initiating authentication', this.error);
+            this.showError('Error connecting to Todoist', this.error);
         } finally {
             this.loading = false;
         }
     }
 
-    async handleOAuthCallback(code, state) {
+    async handleTestConnection() {
+        if (!this.apiToken) {
+            this.showError('Error', 'Please enter a valid API token');
+            return;
+        }
+
         try {
             this.loading = true;
             this.error = null;
-            console.log('Processing OAuth callback');
-            await handleOAuthCallback(code, state);
-            await this.checkConnectionStatus();
-            this.showSuccess('Successfully connected to Todoist');
-            // Clear the URL parameters
-            window.history.replaceState({}, document.title, window.location.pathname);
+            console.log('[TodoistSettings] Testing connection...');
+            const result = await testConnection({ token: this.apiToken });
+            console.log('[TodoistSettings] Test connection result:', result);
+            this.showSuccess('Connection test successful');
         } catch (error) {
-            console.error('Error in handleOAuthCallback:', error);
+            console.error('[TodoistSettings] Error testing connection:', error);
             this.error = this.getErrorMessage(error);
-            this.showError('Error completing authentication', this.error);
+            this.showError('Connection test failed', this.error);
         } finally {
             this.loading = false;
         }
@@ -89,9 +143,10 @@ export default class TodoistSettings extends LightningElement {
             this.error = null;
             await disconnect();
             this.connected = false;
+            this.apiToken = '';
             this.showSuccess('Successfully disconnected from Todoist');
         } catch (error) {
-            console.error('Error disconnecting:', error);
+            console.error('[TodoistSettings] Error disconnecting:', error);
             this.error = this.getErrorMessage(error);
             this.showError('Error disconnecting', this.error);
         } finally {
@@ -100,20 +155,25 @@ export default class TodoistSettings extends LightningElement {
     }
 
     getErrorMessage(error) {
-        console.error('Raw error:', error);
+        console.log('[TodoistSettings] Getting error message for:', error);
         if (error.body && error.body.message) {
+            console.log('[TodoistSettings] Using error.body.message:', error.body.message);
             return error.body.message;
         }
         if (error.message) {
+            console.log('[TodoistSettings] Using error.message:', error.message);
             return error.message;
         }
         if (typeof error === 'string') {
+            console.log('[TodoistSettings] Using error string:', error);
             return error;
         }
+        console.log('[TodoistSettings] Using default error message');
         return 'An unknown error occurred';
     }
 
     showSuccess(title, message = '') {
+        console.log('[TodoistSettings] Showing success toast:', { title, message });
         this.dispatchEvent(new ShowToastEvent({
             title,
             message,
@@ -122,6 +182,7 @@ export default class TodoistSettings extends LightningElement {
     }
 
     showError(title, message) {
+        console.log('[TodoistSettings] Showing error toast:', { title, message });
         this.dispatchEvent(new ShowToastEvent({
             title,
             message,
